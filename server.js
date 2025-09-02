@@ -4,12 +4,14 @@ import errorHandler from "./middleware/errorHandler.js";
 import dotenv from 'dotenv';
 import appRoutes from "./routes/appRoutes.js";
 import reqStack from "./middleware/reqHandler.js"
+import cors from 'cors';
 
 // setup
 const app = express();
 dotenv.config();
 
 //middlewares
+app.use(cors());
 app.use(express.json());
 app.use(logMiddleware);
 app.use(reqStack);
