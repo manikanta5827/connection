@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import { sendMail } from "../service/mailer.js";
+import { findUserById } from "../repository/userRepository.js";
 
 const prisma = new PrismaClient();
 
@@ -27,6 +29,7 @@ export const sendConnectionRequest = async(req,res) => {
         })
     }
 
+    const sender = await prisma.user.findUnique({where: {id: senderId}});
     const receiver = await prisma.user.findUnique({ where: { id: receiverId } });
     if (!receiver) {
         return res.status(404).json({ 
@@ -42,7 +45,7 @@ export const sendConnectionRequest = async(req,res) => {
     if (existing && existing.status === 'PENDING') {
         return res.status(400).json({ 
             status: "error",
-            message : "Connection request already exists"
+            message : "Connection request is in pending"
         });
     }
 
@@ -66,6 +69,12 @@ export const sendConnectionRequest = async(req,res) => {
 
     await prisma.connection.create({ data: { senderId, receiverId } });
 
+    await sendMail(
+        receiver.email,
+        "New Friend Request",
+        "friend_request",
+        { receiverName: receiver.username, senderName: sender.username }
+    );
     return res.status(201).json({
         success: 'success',
         message: "Connection request sent"
@@ -110,6 +119,16 @@ export const acceptConnectionRequest = async (req,res) => {
       data: { status: "ACCEPTED" }
     });
 
+    const senderOfTheRequest = await findUserById(connection.senderId);
+    const receiverOfTheRequest = await findUserById(connection.receiverId);
+
+    await sendMail(
+        senderOfTheRequest.email,
+        "Friend Request Accepted",
+        "request_accepted",
+        { senderName: senderOfTheRequest.username, receiverName: receiverOfTheRequest.username }
+    );
+
     return res.json({
       success: true,
       message: "Connection request accepted"
@@ -153,6 +172,16 @@ export const rejectConnectionRequest = async (req, res) => {
         where: { id: connectionId },
         data: { status: "REJECTED" }
     });
+
+    const senderOfTheRequest = await findUserById(connection.senderId);
+    const receiverOfTheRequest = await findUserById(connection.receiverId);
+
+    await sendMail(
+        senderOfTheRequest.email,
+        "Friend Request Rejected",
+        "request_rejected",
+        { senderName: senderOfTheRequest.username, receiverName: receiverOfTheRequest.username }
+    );
 
     return res.json({
         success: true,
