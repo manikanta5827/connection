@@ -5,7 +5,7 @@ A modern social networking application built with Node.js, Express, and Prisma, 
 ## Technology Stack
 
 - **Backend**: Node.js, Express.js
-- **Database**: SQLite with Prisma ORM
+- **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: JWT, bcrypt for password hashing
 - **Email Service**: Nodemailer with Gmail SMTP
 - **Logging**: Winston logger with custom middleware
@@ -60,7 +60,7 @@ A modern social networking application built with Node.js, Express, and Prisma, 
 - Configurable email settings through environment variables
 
 ### 4. Data Management
-- SQLite database with Prisma ORM
+- PostgreSQL database with Prisma ORM
 - Efficient data relationships and indexing
 - Automatic timestamp management
 - Cascade deletion for data integrity
@@ -104,12 +104,14 @@ A modern social networking application built with Node.js, Express, and Prisma, 
 ### Prerequisites
 - Node.js (v14 or higher)
 - npm or yarn
+- PostgreSQL database (local or cloud)
 - Gmail account for email service
 
 ### Environment Variables
 Create a `.env` file with the following variables:
 ```env
 PORT=3400
+DATABASE_URL="postgresql://username:password@localhost:5432/connection_db"
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-app-password
 JWT_SECRET=your-jwt-secret
@@ -118,9 +120,10 @@ JWT_SECRET=your-jwt-secret
 ### Installation Steps
 1. Clone the repository
 2. Install dependencies: `npm install`
-3. Set up environment variables
-4. Run database migrations: `npx prisma migrate dev`
-5. Start the server: `npm start`
+3. Set up PostgreSQL database (see [POSTGRESQL_SETUP.md](./POSTGRESQL_SETUP.md))
+4. Configure environment variables with database connection
+5. Run database migrations: `npx prisma migrate dev`
+6. Start the server: `npm start`
 
 ## Project Structure
 
@@ -155,3 +158,7 @@ connection/
 - **Protected Routes**: Authentication middleware for sensitive endpoints
 
 This connection platform provides a robust foundation for social networking applications, ensuring secure user interactions, efficient data management, and professional user experience through automated email notifications.
+
+## Migration from SQLite
+
+This project has been upgraded from SQLite to PostgreSQL for better performance, scalability, and production readiness. For detailed migration instructions, see [POSTGRESQL_SETUP.md](./POSTGRESQL_SETUP.md).
